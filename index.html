@@ -1,19 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="hi">
 <head>
-  <title>TTS App</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceBaba AI - Text to Speech</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f9; }
+        .container { max-width: 500px; margin: auto; padding: 20px; background: white; border-radius: 10px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); }
+        textarea { width: 90%; height: 100px; padding: 10px; font-size: 16px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        select { width: 95%; padding: 10px; font-size: 16px; margin-bottom: 20px; border-radius: 5px; }
+        button { padding: 12px 25px; font-size: 16px; cursor: pointer; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        audio { margin-top: 20px; width: 100%; display: none; }
+    </style>
 </head>
 <body>
 
-<button onclick="speak()">Voice Generate</button>
+<div class="container">
+    <h2>VoiceBaba AI (Multi-Voice)</h2>
+    <p>हिंदी में टाइप करें, आवाज़ जनरेट करें</p>
+    
+    <textarea id="textInput" placeholder="यहाँ हिंदी में कुछ टाइप करें..."></textarea>
+    
+    <select id="voiceSelect">
+        <option value="ur-PK-AsadNeural">Asad (Urdu Male - Auto Translate)</option>
+        <option value="ur-IN-SalmanNeural">Salman (Indian Urdu Male)</option>
+        <option value="hi-IN-MadhurNeural">Madhur (Hindi Male)</option>
+        <option value="hi-IN-SwaraNeural">Swara (Hindi Female)</option>
+    </select>
+    <br>
+    
+    <button id="generateBtn" onclick="generateVoice()">आवाज़ जनरेट करें</button>
+
+    <audio id="audioPlayer" controls></audio>
+</div>
 
 <script>
-async function speak() {
-  const res = await fetch("https://your-worker-url.workers.dev");
-  const blob = await res.blob();
+async function generateVoice() {
+    const text = document.getElementById("textInput").value;
+    const voice = document.getElementById("voiceSelect").value;
+    const btn = document.getElementById("generateBtn");
+    const audioPlayer = document.getElementById("audioPlayer");
 
-  const audio = new Audio(URL.createObjectURL(blob));
-  audio.play();
+    if (!text) {
+        alert("भाई, पहले कुछ टेक्स्ट तो लिखो!");
+        return;
+    }
+
+    // यह अपने आप आपकी वेबसाइट का URL पकड़ लेगा
+    const API_URL = window.location.origin + "/tts"; 
+
+    btn.innerText = "लोड हो रहा है...";
+    btn.disabled = true;
+    audioPlayer.style.display = "none";
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ text: text, voice: voice })
+        });
+
+        if (!response.ok) {
+            throw new Error("सर्वर से कोई दिक्कत आ रही है।");
+        }
+
+        const blob = await response.blob();
+        const audioUrl = URL.createObjectURL(blob);
+        
+        audioPlayer.src = audioUrl;
+        audioPlayer.style.display = "block";
+        audioPlayer.play();
+
+    } catch (error) {
+        alert("एरर: " + error.message);
+    } finally {
+        btn.innerText = "आवाज़ जनरेट करें";
+        btn.disabled = false;
+    }
 }
 </script>
 
