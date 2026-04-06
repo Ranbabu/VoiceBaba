@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TTS App</title>
+</head>
+<body>
+
+<button onclick="speak()">Voice Generate</button>
+
+<script>
+async function speak() {
+  const res = await fetch("https://your-worker-url.workers.dev");
+  const blob = await res.blob();
+
+  const audio = new Audio(URL.createObjectURL(blob));
+  audio.play();
+}
+</script>
+
+</body>
+</html>
