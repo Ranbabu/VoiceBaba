@@ -1,2 +1,5 @@
 flask
-TTS==0.22.0
+flask-cors
+edge-tts
+gunicorn
+deep-translator
