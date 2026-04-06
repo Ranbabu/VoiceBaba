@@ -1,2 +1,2 @@
 flask
-TTS
+TTS==0.22.0
